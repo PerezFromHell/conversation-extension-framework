@@ -1,6 +1,6 @@
 /**
 * @Date:   2017-03-21T21:11:26-05:00
-* @Last modified time: 2017-03-22T00:07:27-05:00
+ * @Last modified time: 2017-04-05T13:00:03-05:00
 * @License: Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -25,6 +25,7 @@ You may obtain a copy of the License at
 
 // Example API connection that returns a random dice roll after a short delay.
 // Important that these API connections return a Promise!
+// This promise should promise to return an updated context and private context
 let rollDice = function (usePrivate, context, privateContext) {
   return rollPromise().then((roll) => {
     if (usePrivate) {
