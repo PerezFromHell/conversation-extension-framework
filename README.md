@@ -59,16 +59,9 @@ in your response text. The framework will replace these tokens with the value of
 The Node.js 7.6+ requirement is a hard requirement as this time. It's possible that this can be used on previous versions, but in order to do so, it will need to be transpiled with compatibility for `async/await` and will require a ES2015 polyfill like [babel-polyfill](https://babeljs.io/docs/usage/polyfill/)
 
 ## Installation
-To install, add the following line to your dependency list in your package.json*
+To install, run the following npm command
 
-`"conversation-extension-framework": "pthoresen/conversation-extension-framework",`
-
-Then tell npm to fetch the repo by issuing the install command.
-
-`npm install`
-
-### Note
-*This is a temporary step during development. The tool will move to npm and the installation steps will simplify at that time.
+`npm install --save conversation-extension-framework`
 
 ## Usage
 An example implementation is provided at [./example/](./example/).
@@ -261,7 +254,7 @@ let cfenv = require('cfenv')
 // This is the important piece to using the framework. We need to initialize this object
 // with our conversation credentials and then send any incoming messages through the
 // handleIncoming function
-let conversationExtension = new (require('../'))(process.env.CONVERSATION_API_URL, process.env.CONVERSATION_API_USER, process.env.CONVERSATION_API_PASSWORD)
+let conversationExtension = new (require('conversation-extension-framework'))(process.env.CONVERSATION_API_URL, process.env.CONVERSATION_API_USER, process.env.CONVERSATION_API_PASSWORD)
 
 // Here is where APIs are registered. When conversation responds with a value in
 // output.apiCall with the format "callName:public" or "callName:private" or just "callName"
