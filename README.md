@@ -47,10 +47,10 @@ I bet you want to use that private variable in your conversation responses? To a
 
 in your response text. The framework will replace these tokens with the value of that variable no matter if it was stored in your Watson Conversation context or privately on your application!
 
-#####Ready to get started building that truly dynamic chat bot...?
+##### Ready to get started building that truly dynamic chat bot...?
 
 
-##Requirements
+## Requirements
 * Node.js 7.6+
 * Your own front-end chat client. (Slack, Facebook Messenger, Web App, etc...) This tool does **NOT** contain any front-end code
 * An instance of Watson Conversation on Bluemix
@@ -70,7 +70,7 @@ Then tell npm to fetch the repo by issuing the install command.
 ###Note
 *This is a temporary step during development. The tool will move to npm and the installation steps will simplify at that time.
 
-##Usage
+## Usage
 An example implementation is provided at [./example/](./example/).
 
 The conversation extension framework is, at its core, an object. The class needs to be imported
