@@ -55,10 +55,10 @@ in your response text. The framework will replace these tokens with the value of
 * Your own front-end chat client. (Slack, Facebook Messenger, Web App, etc...) This tool does **NOT** contain any front-end code
 * An instance of Watson Conversation on Bluemix
 
-###Note
+### Note
 The Node.js 7.6+ requirement is a hard requirement as this time. It's possible that this can be used on previous versions, but in order to do so, it will need to be transpiled with compatibility for `async/await` and will require a ES2015 polyfill like [babel-polyfill](https://babeljs.io/docs/usage/polyfill/)
 
-##Installation
+## Installation
 To install, add the following line to your dependency list in your package.json*
 
 `"conversation-extension-framework": "pthoresen/conversation-extension-framework",`
@@ -67,7 +67,7 @@ Then tell npm to fetch the repo by issuing the install command.
 
 `npm install`
 
-###Note
+### Note
 *This is a temporary step during development. The tool will move to npm and the installation steps will simplify at that time.
 
 ## Usage
