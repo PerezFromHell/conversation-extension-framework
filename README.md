@@ -331,17 +331,17 @@ Let's say that we want to allow a user to ask Watson to roll a dice. We've defin
 
 Asking Watson to use our example dice roll API requires 2 dialog nodes.
 
-<img src=./doc/rollDice-flow.png height="400px">
+<img src="https://raw.githubusercontent.com/pthoresen/conversation-extension-framework/master/doc/rollDice-flow.png" height="300px">
 
 The first node will tell the framework to use the diceRoll API that we registered. The content of the node is shown below:
 
-<img src=./doc/rollDice-apiNode.png height="400px">
+<img src="https://raw.githubusercontent.com/pthoresen/conversation-extension-framework/master/doc/rollDice-apiNode.png" height="400px">
 
 When our framework sees the `output.apiCall` property, it will attempt to locate the api registered as 'diceRoll' and it will set the usePrivate flag to `true`
 
 This will set `privateContext.diceRoll` to be a value between 1 and 6 based on our implementation. The application will then reply to Watson Conversation which triggers the next node, which reports the result of our dice roll.
 
-<img src=./doc/rollDice-resultsNode.png height="400px">
+<img src="https://raw.githubusercontent.com/pthoresen/conversation-extension-framework/master/doc/rollDice-resultsNode.png" height="400px">
 
 The token `{{diceRoll}}` will be replaced with either `privateContext.diceRoll` or `context.diceRoll` in the `responseText` property
 
@@ -351,17 +351,17 @@ The final `responseText` will be *'You have rolled a 3. This was stored privatel
 
 Storing a user's next response as a context or privateContext field just takes 1 dialog node. In this example, we'll confirm that the value was stored with the second node.
 
-<img src=./doc/changeName-flow.png height="400px">
+<img src="https://raw.githubusercontent.com/pthoresen/conversation-extension-framework/master/doc/changeName-flow.png" height="300px">
 
 The first node will need to inform the application that it will store the user's response in `privateContext.name`. To do this, we'll need to set the `output.updatesContext` propery.
 
-<img src=./doc/changeName-updateContextNode.png height="400px">
+<img src="https://raw.githubusercontent.com/pthoresen/conversation-extension-framework/master/doc/changeName-updateContextNode.png" height="400px">
 
 This tells the application to store the next user response as `privateContext.name`. Had the ':private' suffix been omitted, it would have stored the response as `context.name`
 
 Just as in the previous example, we can substitute the value into the response by using `{{name}}` token in our response.
 
-<img src=./doc/changeName-confirmNode.png height="400px">
+<img src="https://raw.githubusercontent.com/pthoresen/conversation-extension-framework/master/doc/changeName-confirmNode.png" height="400px">
 
 
 ## Handling Mutiple Front Ends
