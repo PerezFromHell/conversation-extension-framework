@@ -77,9 +77,9 @@ and then initialized
 where:
 
 ```
-	conversationUrl: https://gateway.watsonplatform.net/conversation/api/v1/workspaces/<WORKSPACE_ID>/message?version=<VERSION>
-	conversationUser: Username from the Watson Conversation credentials (not your bluemix account)
-	conversationPass: Password from the Watson Conversation credentials (not your bluemix account)
+conversationUrl: https://gateway.watsonplatform.net/conversation/api/v1/workspaces/<WORKSPACE_ID>/message?version=<VERSION>
+conversationUser: Username from the Watson Conversation credentials (not your bluemix account)
+conversationPass: Password from the Watson Conversation credentials (not your bluemix account)
 ```
 
 API calls are registered to this object using the `addAPI` function
