@@ -1,6 +1,6 @@
 {
   "name": "conversation-extension-framework",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "main": "./index.js",
   "scripts": {
     "test": "istanbul cover jasmine && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
