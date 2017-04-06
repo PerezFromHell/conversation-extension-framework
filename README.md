@@ -72,7 +72,15 @@ The conversation extension framework is, at its core, an object. The class needs
 
 and then initialized
 
-`let conEx = new ConversationExtension('conversation URL', 'conversation username', 'conversation password')`
+`let conEx = new ConversationExtension({string} conversationUrl, {string} conversationUser, {string} conversationPassword)`
+
+where:
+
+```
+	conversationUrl: https://gateway.watsonplatform.net/conversation/api/v1/workspaces/<WORKSPACE_ID>/message?version=<VERSION>
+	conversationUser: Username from the Watson Conversation credentials (not your bluemix account)
+	conversationPass: Password from the Watson Conversation credentials (not your bluemix account)
+```
 
 API calls are registered to this object using the `addAPI` function
 
