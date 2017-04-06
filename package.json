@@ -1,6 +1,6 @@
 {
   "name": "conversation-extension-framework",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "keywords": [
     "watson",
     "conversation",
@@ -12,7 +12,9 @@
     "starter"
   ],
   "main": "./index.js",
-  "engines" : { "node" : ">=7.6.0"},
+  "engines": {
+    "node": ">=7.6.0"
+  },
   "files": [
     "src/"
   ],
@@ -23,8 +25,8 @@
     "test-local": "istanbul cover jasmine"
   },
   "repository": {
-    "type": "git",
-    "url": "https://github.com/pthoresen/conversation-extension-framework.git"
+    "type": "",
+    "url": ""
   },
   "bugs": {
     "url": "https://github.com/pthoresen/conversation-extension-framework/issues"
@@ -42,10 +44,6 @@
     "istanbul": "1.1.0-alpha.1",
     "jasmine": "2.5.3",
     "supertest": "3.0.0"
-  },
-  "repository": {
-    "type": "",
-    "url": ""
   },
   "license": "Apache-2.0",
   "description": "The Watson Conversation Extension Framework is a Node.js tool that allows developers quickly add dynamic functionality to their IBM Watson Conversation powered chatbots."
