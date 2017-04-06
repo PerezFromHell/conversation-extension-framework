@@ -1,6 +1,6 @@
 /**
 * @Date:   2017-03-21T21:11:26-05:00
- * @Last modified time: 2017-04-05T13:00:03-05:00
+ * @Last modified time: 2017-04-05T18:46:57-05:00
 * @License: Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -34,9 +34,6 @@ let rollDice = function (usePrivate, context, privateContext) {
       context.diceRoll = roll
     }
     return ({context, privateContext})
-  }, (error) => {
-    console.error(error)
-    return error
   })
 }
 
