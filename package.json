@@ -3,17 +3,22 @@
   "version": "0.0.1",
   "main": "./index.js",
   "scripts": {
-    "test": "istanbul cover jasmine && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js"
+    "test": "istanbul cover jasmine && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js",
+    "test-local": "istanbul cover jasmine"
   },
   "dependencies": {
     "request": "2.81.0"
   },
   "devDependencies": {
+    "body-parser": "1.17.1",
+    "cfenv": "1.0.4",
     "chance": "1.0.6",
-    "coveralls": "^2.13.0",
+    "coveralls": "2.13.0",
     "dotenv": "4.0.0",
+    "express": "4.15.2",
     "istanbul": "1.1.0-alpha.1",
-    "jasmine": "2.5.3"
+    "jasmine": "2.5.3",
+    "supertest": "3.0.0"
   },
   "repository": {
     "type": "",

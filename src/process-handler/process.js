@@ -1,6 +1,6 @@
 /**
 * @Date:   2017-03-19T20:00:40-05:00
-* @Last modified time: 2017-04-04T14:29:16-05:00
+ * @Last modified time: 2017-04-05T23:56:29-05:00
 * @License: Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -32,88 +32,87 @@ let apiCallDirector = require('./api-call-director')
  *                          }
  * @return {Promise} a promise to return {responseText, userData}
  */
-let processMessage = function (incomingMessageText, userId, source, options) {
-  return new Promise(async (resolve, reject) => {
-    // Get the user's data (context, privateContext, responseOptions)
-    let userData = processUtils.retrieveUserData(userId, source)
+let processMessage = async function (incomingMessageText, userId, source, options) {
+  // Get the user's data (context, privateContext, responseOptions)
+  let userData = processUtils.retrieveUserData(userId, source)
 
-    // Check if we're expecting a field to be updated. If so, update the field in
-    // the appropriate scope.
-    if (userData.responseOptions.updatesContext) {
-      if (userData.responseOptions.updatesContextType === 'private') {
-        if (!userData.responseOptions.updatesContextField) {
-          console.warn('No context field specified for update')
-        } else {
-          userData.context[userData.responseOptions.updatesContextField] = 'private'
-          userData.privateContext[userData.responseOptions.updatesContextField] = incomingMessageText
-        }
+  // Check if we're expecting a field to be updated. If so, update the field in
+  // the appropriate scope.
+  if (userData.responseOptions.updatesContext) {
+    if (userData.responseOptions.updatesContextType === 'private') {
+      if (!userData.responseOptions.updatesContextField) {
+        console.warn('No context field specified for update')
       } else {
-        if (!userData.responseOptions.updatesContextField) {
-          console.warn('No context field specified for update')
-        } else {
-          userData.context[userData.responseOptions.updatesContextField] = incomingMessageText
-        }
+        userData.context[userData.responseOptions.updatesContextField] = 'private'
+        userData.privateContext[userData.responseOptions.updatesContextField] = incomingMessageText
+      }
+    } else {
+      if (!userData.responseOptions.updatesContextField) {
+        console.warn('No context field specified for update')
+      } else {
+        userData.context[userData.responseOptions.updatesContextField] = incomingMessageText
       }
     }
-    // Store the data to memory
+  }
+  // Store the data to memory
 
-    // Potentially multiple API calls can be made
-    let conversationResponse = {}
-    do {
-      // Send message to Watson Conversation
+  // Potentially multiple API calls can be made
+  let conversationResponse = {}
+  do {
+    // Send message to Watson Conversation
+    try {
+      conversationResponse = await conversationUtils.sendMessageToConversation(incomingMessageText, userData.context, options.conversationUrl, options.conversationUser, options.conversationPassword)
+    } catch (e) {
+      console.error('Error calling Watson Conversation')
+      throw e
+    }
+    userData.context = conversationResponse.context
+    // Store updated public context from Watson Conversation
+    processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
+
+    // Check if the handler needs to make an API call
+    if (conversationResponse.output.apiCall) {
+      let {field, destination} = getFieldAndDestination(conversationResponse.output.apiCall)
+      let {context, privateContext} = {}
       try {
-        conversationResponse = await conversationUtils.sendMessageToConversation(incomingMessageText, userData.context, options.conversationUrl, options.conversationUser, options.conversationPassword)
+        ({context, privateContext} = await apiCallDirector.direct(field, destination === 'private', userData.context, userData.privateContext))
       } catch (e) {
-        throw new Error('Error calling Watson Conversation')
+        console.error('Error calling API Call Director')
+        throw e
       }
 
-      userData.context = conversationResponse.context
-      // Store updated public context from Watson Conversation
-      processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
-
-      // Check if the handler needs to make an API call
-      if (conversationResponse.output.apiCall) {
-        let {field, destination} = getFieldAndDestination(conversationResponse.output.apiCall)
-        let {context, privateContext} = {}
-        try {
-          ({context, privateContext} = await apiCallDirector.direct(field, destination === 'private', userData.context, userData.privateContext))
-        } catch (e) {
-          throw new Error('Error calling API Call Director')
-        }
-
-        userData.context = context
-        userData.privateContext = privateContext
-        // Otherwise check if we need to mark the next response
-      } else {
-        // Assign responseOptions so that we anticipate that the next user response
-        // will be assigned to this value
-        if (conversationResponse.output.updatesContext) {
-          let {field, destination} = getFieldAndDestination(conversationResponse.output.updatesContext)
-          // field is not an empty string and only contains chars
-          if (field.length > 0 && !(/\W/.test(field))) {
-            userData.responseOptions.updatesContext = true
-            userData.responseOptions.updatesContextField = field
-            userData.responseOptions.updatesContextType = destination
-          } else {
-            console.warn('update context request is malformed')
-            userData.responseOptions.updatesContext = false
-          }
-        // Otherwise make sure that response options is current
+      userData.context = context
+      userData.privateContext = privateContext
+      // Otherwise check if we need to mark the next response
+    } else {
+      // Assign responseOptions so that we anticipate that the next user response
+      // will be assigned to this value
+      if (conversationResponse.output.updatesContext) {
+        let {field, destination} = getFieldAndDestination(conversationResponse.output.updatesContext)
+        // field is not an empty string and only contains chars
+        if (field.length > 0 && !(/\W/.test(field))) {
+          userData.responseOptions.updatesContext = true
+          userData.responseOptions.updatesContextField = field
+          userData.responseOptions.updatesContextType = destination
         } else {
+          console.warn('update context request is malformed')
           userData.responseOptions.updatesContext = false
         }
-        if (!userData.responseOptions.updatesContext) {
-          delete userData.responseOptions.updatesContextField
-          delete userData.responseOptions.updatesContextType
-        }
+      // Otherwise make sure that response options is current
+      } else {
+        userData.responseOptions.updatesContext = false
       }
-      // Store updated public context from Watson Conversation
-      processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
-    } while (conversationResponse.output.apiCall)
+      if (!userData.responseOptions.updatesContext) {
+        delete userData.responseOptions.updatesContextField
+        delete userData.responseOptions.updatesContextType
+      }
+    }
+    // Store updated public context from Watson Conversation
+    processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
+  } while (conversationResponse.output.apiCall)
 
-    let responseText = processUtils.augmentResponse(conversationResponse.output.text.join('\r'), userData.context, userData.privateContext)
-    resolve({responseText, userData})
-  })
+  let responseText = processUtils.augmentResponse(conversationResponse.output.text.join('\r'), userData.context, userData.privateContext)
+  return {responseText, userData}
 }
 
 function getFieldAndDestination (expression) {

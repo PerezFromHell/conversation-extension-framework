@@ -1,9 +1,9 @@
 /**
 * @Date:   2017-03-19T20:34:15-05:00
 <<<<<<< HEAD
-* @Last modified time: 2017-04-04T18:06:18-05:00
+ * @Last modified time: 2017-04-06T00:12:20-05:00
 =======
-* @Last modified time: 2017-04-04T18:06:18-05:00
+ * @Last modified time: 2017-04-06T00:12:20-05:00
 >>>>>>> feature-better-api-plugin-management
 * @License: Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -37,8 +37,9 @@ let direct = async function (apiCall, usePrivate, context, privateContext) {
     let results = await apiCallIndex[apiCall](usePrivate, context, privateContext)
     context = results.context
     privateContext = results.privateContext
-  } catch (err) {
+  } catch (e) {
     console.error('unable to make "' + apiCall + '" API call. ensure that the name is registered correctly in the API director and the API calls are defined properly')
+    throw e
   }
 
   return {context, privateContext}

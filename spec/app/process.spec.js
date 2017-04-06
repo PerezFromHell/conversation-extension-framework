@@ -1,6 +1,6 @@
 /**
 * @Date:   2017-03-19T23:23:08-05:00
-* @Last modified time: 2017-04-04T19:24:01-05:00
+ * @Last modified time: 2017-04-06T00:46:35-05:00
 * @License: Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -18,9 +18,6 @@ let conversationUtils = require('../../src/utils/conversation')
 let ConversationExtension = require('../../src/core')
 let conversationExtensionInstance = new ConversationExtension(process.env.CONVERSATION_API_URL, process.env.CONVERSATION_API_USER, process.env.CONVERSATION_API_PASSWORD)
 
-// mute console warnings
-console.warn = () => {}
-// console.log = () => {}
 
 describe('Verify support functions', () => {
   it('stores and retrieves user data from memory', () => {
@@ -76,6 +73,20 @@ describe('Process handler', () => {
       let userData = processUtils.retrieveUserData('A0A0A2', 'generic')
       expect(userData.privateContext.shouldExistPrivately).toEqual('test')
       expect(userData.context.shouldExistPrivately).toEqual('private')
+    })
+    it('and doesn\'t change context if there is no context field specified', () => {
+      processUtils.storeUserData('A0A3A1', 'generic', {'public': 'public'}, {'private': 'private'}, {'updatesContext': true})
+      conversationExtensionInstance.handleIncoming('test', 'A0A3A1', 'generic')
+      let userData = processUtils.retrieveUserData('A0A3A1', 'generic')
+      expect(userData.context).toEqual({'public': 'public'})
+      expect(userData.privateContext).toEqual({'private': 'private'})
+    })
+    it('and doesn\'t change context if there is no context field specified privately', () => {
+      processUtils.storeUserData('A0A3A2', 'generic', {'public': 'public'}, {'private': 'private'}, {'updatesContext': true, 'updatesContextType': 'private'})
+      conversationExtensionInstance.handleIncoming('test', 'A0A3A2', 'generic')
+      let userData = processUtils.retrieveUserData('A0A3A2', 'generic')
+      expect(userData.context).toEqual({'public': 'public'})
+      expect(userData.privateContext).toEqual({'private': 'private'})
     })
   })
   describe('stores context from Watson Conversation', () => {
@@ -158,6 +169,35 @@ describe('Process handler', () => {
       })
       it('updates responseOptions with data from Watson Conversation', () => {
         let userData = processUtils.retrieveUserData('A0A0A5', 'generic')
+        expect(userData.responseOptions.updatesContext).toEqual(true)
+        expect(userData.responseOptions.updatesContextField).toEqual('testField')
+        expect(userData.responseOptions.updatesContextType).toEqual('public')
+      })
+    })
+
+    describe('for expected update to assumed public context field', () => {
+      beforeAll(async (done) => {
+        spyOn(conversationUtils, 'sendMessageToConversation').and.callFake(() => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve(
+                {
+                  output: {
+                    text: ['test-response'],
+                    updatesContext: 'testField:this Is Fake'
+                  },
+                  context: {
+                    test: 'test-value'
+                  }
+                }
+              )}, 200)
+            })
+        })
+        await conversationExtensionInstance.handleIncoming('test', 'A0A4A1', 'generic')
+        done()
+      })
+      it('updates responseOptions with data from Watson Conversation', () => {
+        let userData = processUtils.retrieveUserData('A0A4A1', 'generic')
         expect(userData.responseOptions.updatesContext).toEqual(true)
         expect(userData.responseOptions.updatesContextField).toEqual('testField')
         expect(userData.responseOptions.updatesContextType).toEqual('public')
@@ -331,6 +371,10 @@ describe('Process handler', () => {
       let text = processUtils.augmentResponse('User: {{greeting}}, {{location}}!', {}, {greeting: 'hello', location: 'world'})
       expect(text).toEqual('User: hello, world!')
     })
+    it('indicates that a requested value is not present', () => {
+      let text = processUtils.augmentResponse('{{doesNotExist}}', {}, {greeting: 'hello', location: 'world'})
+      expect(text).toEqual('**VALUENOTFOUND**')
+    })
   })
 })
 describe('augments a message as requested by conversation', () => {
@@ -386,6 +430,72 @@ describe('augments a message as requested by conversation', () => {
     })
     it ('expects an augmented response', () => {
       expect(responseText).toEqual('Hello, Mars')
+    })
+  })
+})
+describe('handles errors gracefully', () => {
+  describe('when watson conversation fails', () => {
+    let response = {}
+    beforeAll(async (done) => {
+      spyOn(conversationUtils, 'sendMessageToConversation').and.callFake(() => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(
+              {
+                error: 'this is a fake error'
+              }
+          ) }, 200)
+        })
+      })
+      try {
+        response = await conversationExtensionInstance.handleIncoming('test', 'A0A1A2', 'generic')
+      } catch (e) {
+        response = 'ERROR'
+      }
+      done()
+    })
+    it('should throw an error', () => {
+      expect(response).toBe('ERROR')
+    })
+  })
+  describe('when api call director fails', () => {
+    let response = {}
+    beforeAll(async (done) => {
+      conversationExtensionInstance.addAPI('thisFails', () => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            reject(
+              {
+                error: 'this is a fake error'
+              }
+          ) }, 200)
+        })
+      })
+      spyOn(conversationUtils, 'sendMessageToConversation').and.callFake(() => {
+        return new Promise((resolve, reject) => {
+          setTimeout(() => {
+            resolve(
+              {
+                output: {
+                  text: ['test-response'],
+                  apiCall: 'thisFails'
+                },
+                context: {
+                  test: 'test-value'
+                }
+              }
+          ) }, 200)
+        })
+      })
+      try {
+        response = await conversationExtensionInstance.handleIncoming('test', 'A0A1A2', 'generic')
+      } catch (e) {
+        response = 'ERROR'
+      }
+      done()
+    })
+    it('should throw an error', () => {
+      expect(response).toBe('ERROR')
     })
   })
 })

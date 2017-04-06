@@ -1,6 +1,6 @@
 /**
 * @Date:   2017-04-03T12:00:38-05:00
-* @Last modified time: 2017-04-04T19:23:06-05:00
+ * @Last modified time: 2017-04-05T23:55:51-05:00
 * @License: Licensed under the Apache License, Version 2.0 (the "License");  you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
@@ -31,6 +31,7 @@ class conversationExtension {
       return (await this.handler.processMessage(incomingMessageText, userId, source, this.options))
     } catch (e) {
       console.error(e)
+      throw e
     }
   }
 }
