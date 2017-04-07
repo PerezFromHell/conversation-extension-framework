@@ -72,7 +72,7 @@ The conversation extension framework is, at its core, an object. The class needs
 
 and then initialized
 
-`let conEx = new ConversationExtension({string} conversationUrl, {string} conversationUser, {string} conversationPassword)`
+`let conEx = new ConversationExtension(conversationUrl, conversationUser, conversationPassword)`
 
 where:
 
