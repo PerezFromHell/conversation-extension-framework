@@ -113,7 +113,8 @@ This function will return a `Promise` to return the following object:
     	updatesContextType: {string} ('public' | 'private') if the update will occur to context or privateContext
     	updatesContextField: {string} the field name to be updated (...context['fieldName'])
     }
-  }
+  },
+  "conversationResponse": The raw, final response from Watson Conversation
 }
 ```
 

@@ -16,5 +16,7 @@ describe('Example App', () => {
     expect(body.userData.context).toEqual(jasmine.any(Object))
     expect(body.userData.privateContext).toBeDefined()
     expect(body.userData.privateContext).toEqual(jasmine.any(Object))
+    expect(body.conversationResponse).toBeDefined()
+    expect(body.conversationResponse).toEqual(jasmine.any(Object))
   })
 })

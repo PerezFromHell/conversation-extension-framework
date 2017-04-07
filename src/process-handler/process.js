@@ -97,7 +97,7 @@ let processMessage = async function (incomingMessageText, userId, source, option
   } while (conversationResponse.output.apiCall)
 
   let responseText = processUtils.augmentResponse(conversationResponse.output.text.join('\r'), userData.context, userData.privateContext)
-  return {responseText, userData}
+  return {responseText, userData, conversationResponse}
 }
 
 function getFieldAndDestination (expression) {
