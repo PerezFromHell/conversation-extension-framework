@@ -158,7 +158,7 @@ Once registered, the function can be accessed in Watson Conversation by adding t
 When making an API call, the application will `await` the resolution of the returned `Promise`
 
 ### Important
-After an API call is made, the application will send a followup message back to Watson Conversation with an empty string for the message text. If you need to access information that was updated in your context or private context as a result of the API call, it should be done in the conversation node that is executed immediately after the node that requested the API call. More information on accessing context values is provided in **Augmenting the Response**
+After an API call is made, the application will send a followup message back to Watson Conversation with an empty string for the message text. If you need to access information that was updated in your context or private context as a result of the API call, it should be done in the conversation node that is executed immediately after the node that requested the API call. An easy way to ensure that this node executes is to make its conditions `true`. More information on accessing context values is provided in **Augmenting the Response**
 
 ## Managing User Data
 
