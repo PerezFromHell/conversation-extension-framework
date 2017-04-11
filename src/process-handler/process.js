@@ -94,6 +94,7 @@ let processMessage = async function (incomingMessageText, userId, source, option
     }
     // Store updated public context from Watson Conversation
     processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
+    incomingMessageText = ''
   } while (conversationResponse.output.apiCall)
 
   let responseText = processUtils.augmentResponse(conversationResponse.output.text.join('\r'), userData.context, userData.privateContext)

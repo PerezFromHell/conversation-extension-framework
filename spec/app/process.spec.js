@@ -102,6 +102,35 @@ describe('Process handler', () => {
       })
     })
 
+    describe('when no output text is received by Watson Conversation', () => {
+      let response = {}
+      beforeAll(async (done) => {
+        spyOn(conversationUtils, 'sendMessageToConversation').and.callFake(() => {
+          return new Promise((resolve, reject) => {
+            setTimeout(() => {
+              resolve ({
+                output: {
+                  text: []
+                },
+                context: {
+                  test: 'test-value'
+                }
+              })
+            }, 200)
+          })
+        }
+
+        )
+        response = await conversationExtensionInstance.handleIncoming('test', 'A0A5A3', 'generic')
+        done()
+      })
+      it('it returns a blank message and updates context', () => {
+        let userData = processUtils.retrieveUserData('A0A5A3', 'generic')
+        expect(userData.context).toEqual({test: 'test-value'})
+        expect(response.responseText).toEqual('')
+      })
+    })
+
     describe('for expected update to private context field', () => {
       beforeAll(async (done) => {
         spyOn(conversationUtils, 'sendMessageToConversation').and.callFake(() => {
