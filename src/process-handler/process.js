@@ -42,6 +42,7 @@ let processMessage = async function (incomingMessageText, userId, source, option
   // Store the data to memory
 
   // Potentially multiple API calls can be made
+  let loopCount = 0
   let conversationResponse = {}
   do {
     // Send message to Watson Conversation
@@ -95,7 +96,8 @@ let processMessage = async function (incomingMessageText, userId, source, option
     // Store updated public context from Watson Conversation
     processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
     incomingMessageText = ''
-  } while (conversationResponse.output.apiCall)
+    loopCount++
+  } while (conversationResponse.output.apiCall && loopCount < 3)
 
   let responseText = processUtils.augmentResponse(conversationResponse.output.text.join('\r'), userData.context, userData.privateContext)
   return {responseText, userData, conversationResponse}
