@@ -325,7 +325,21 @@ describe('Process handler', () => {
         expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalled()
       })
       it('calls API director with correct arguments', () => {
-        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith('diceRoll', false, jasmine.objectContaining({test: 'test-value'}), {'private': 'private'})
+        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith(
+          'diceRoll',
+          false,
+          jasmine.objectContaining({test: 'test-value'}),
+          {'private': 'private'},
+          {
+            output: {
+              text: ['test-response'],
+              apiCall: 'diceRoll'
+            },
+            context: {
+                test: 'test-value'
+            }
+          }
+        )
       })
       it('calls Watson Conversation after leaving API director', () => {
         expect(conversationUtils.sendMessageToConversation.calls.count()).toEqual(2)
@@ -368,7 +382,21 @@ describe('Process handler', () => {
         expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalled()
       })
       it('calls API director with correct arguments', () => {
-        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith('diceRoll', true, {test: 'test-value'}, jasmine.objectContaining({'private': 'private'}))
+        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith(
+          'diceRoll',
+          true,
+          {test: 'test-value'},
+          jasmine.objectContaining({'private': 'private'}),
+          {
+            output: {
+              text: ['test-response'],
+              apiCall: 'diceRoll:private'
+            },
+            context: {
+              test: 'test-value'
+            }
+          }
+        )
       })
       it('calls Watson Conversation after leaving API director', () => {
         expect(conversationUtils.sendMessageToConversation.calls.count()).toEqual(2)

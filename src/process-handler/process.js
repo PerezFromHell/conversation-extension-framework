@@ -61,7 +61,7 @@ let processMessage = async function (incomingMessageText, userId, source, option
       let {field, destination} = getFieldAndDestination(conversationResponse.output.apiCall)
       let {context, privateContext} = {}
       try {
-        ({context, privateContext} = await apiCallDirector.direct(field, destination === 'private', userData.context, userData.privateContext))
+        ({context, privateContext} = await apiCallDirector.direct(field, destination === 'private', userData.context, userData.privateContext, JSON.parse(JSON.stringify(conversationResponse))))
       } catch (e) {
         console.error('Error calling API Call Director')
         throw e

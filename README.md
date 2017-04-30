@@ -126,7 +126,7 @@ The framework allows a developer to register functions that return a `Promise` s
 To register an API call, use the `addAPI` function
 
 ```
-conEx.addAPI('myAPI', (usePrivate, context, privateContext) => {
+conEx.addAPI('myAPI', (usePrivate, context, privateContext, rawResponse) => {
 	return new Promise((resolve, reject) => {
 		resolve({context, privateContext})
 	}
@@ -140,6 +140,7 @@ Arguments:
 	usePrivate: {boolean} a flag to indicate to your function if Watson Conversation has designated the implementation to use private or public context data.
 	context: {object} the (public) context that is sent back and forth from Watson Conversation
 	privateContext: {object} private data that is stored with the application that does not get sent to Watson Conversation
+  rawResponse: {object} a clone of the raw response received from Watson Conversation
 
 Returns:
 	{Promise} that will resolve {context, privateContext}. The logic will use the resolved values to update context and privateContext
