@@ -93,6 +93,10 @@ let processMessage = async function (incomingMessageText, userId, source, option
         delete userData.responseOptions.updatesContextType
       }
     }
+    if (userData.privateContext.transientData) {
+      userData.transientData = userData.privateContext.transientData
+      delete userData.privateContext.transientData
+    }
     // Store updated public context from Watson Conversation
     processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
     incomingMessageText = ''

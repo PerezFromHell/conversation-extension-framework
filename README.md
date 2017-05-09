@@ -85,7 +85,7 @@ conversationPass: Password from the Watson Conversation credentials (not your bl
 API calls are registered to this object using the `addAPI` function
 
 ```
-conEx.addAPI('myAPI', (usePrivate, context, privateContext) => {
+conEx.addAPI('myAPI', (usePrivate, context, privateContext, rawResponse) => {
 	return new Promise((resolve, reject) => {
 		resolve({context, privateContext})
 	}
@@ -111,8 +111,9 @@ This function will return a `Promise` to return the following object:
     "responseOptions": {
     	updatesContext: {boolean} if the next user response will update a context value
     	updatesContextType: {string} ('public' | 'private') if the update will occur to context or privateContext
-    	updatesContextField: {string} the field name to be updated (...context['fieldName'])
-    }
+    	updatesContextField: {string} the field name to be updated (...context['fieldName']),
+    },
+    "transientData": {object} optional extra transient data to return. See **Transient Data** section
   },
   "conversationResponse": The raw, final response from Watson Conversation
 }
@@ -171,6 +172,14 @@ The application is based around the idea of managing two sets context informatio
 
 Both *public* and *private* context can be used to store information to use in API calls as well as to augment the response to the user.
 
+### Transient Data
+
+A special type of data identified as transient data is available to developers as well. This is a specific field, `transientData` in privateContext that will be cleared at each turn in the conversation. This transient data, if available, is returned as part of the response from the `handleIncoming` function.
+
+This is useful if a developer needs to make some data available as part of an API call, but it doesn't necessarily warrant persistence as part of context or privateContext.
+
+To use, simply include an object at `privateContext.transientData` as part of the private context returned from an API call. This will be cleared after it has been returned as part of the response from `handleIncoming`
+
 ### Maintaining State
 
 One of the key functions is to maintain state at the server side. This will allow conversation to flow when the client cannot manage the conversational context, which is basically any case except where you own the client code yourself.
@@ -187,7 +196,7 @@ Even though the user is the same, the application will retrieve two sets of user
 
 ### Storing a User Response
 
-Sometimes a developer will need to store a user's response, for instance, Watson may ask the user a question and need to store that information for later. The application allows for this situation to be quickly and simply addressed with the following syntax on Watson Conversation.
+Sometimes a developer will need to store a user's next response, for instance, Watson may ask the user a question and need to store that information for later. The application allows for this situation to be quickly and simply addressed with the following syntax on Watson Conversation.
 
 ```
 {

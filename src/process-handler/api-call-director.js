@@ -34,6 +34,10 @@ let direct = async function (apiCall, usePrivate, context, privateContext, rawRe
  * @return {void} Registers the API call function
  */
 function addAPI (apiCallName, apiCallPromise) {
+  if (typeof apiCallPromise !== 'function') {
+    console.error('unable to add ' + apiCallName + '. Verify that it is a function that returns a promise.')
+    throw new Error('Invalid argument supplied to addAPI function')
+  }
   apiCallIndex[apiCallName] = apiCallPromise
 }
 

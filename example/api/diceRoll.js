@@ -19,6 +19,9 @@ let rollDice = function (usePrivate, context, privateContext, rawResponse) {
     } else {
       context.diceRoll = roll
     }
+    privateContext.transientData = {
+      diceRollSuccess: true
+    }
     return ({context, privateContext})
   })
 }
