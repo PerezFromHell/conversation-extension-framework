@@ -10,7 +10,13 @@ The Watson Conversation Extension Framework is a Node.js tool that allows develo
 * Context management for front-end interfaces that do not persist context (Slack, Facebook Messenger)
 * Handle inputs from multiple sources (Slack, Facebook Messenger, etc...) with the same core logic
 
+This package provides server side code to handle all communication with Watson Conversation, external (and internal systems), and state management.
+
 But most importantly, the framework is designed to **make it simple** to add these capabilities to your application.
+
+#### What is the Watson Conversation Extension Framework?
+The conversation-extension-framework provides back-end logic to quickly get started building a Watson Conversation chat bot in Node. There is a lot of other work that is required to build a chatbot application, and this package will simplify
+The framework also provides the ability to extend a chatbot and add more advanced features as well, hence the name of the package. Out of the box, it provides the ability to:
 
 #### How simple is it?
 
@@ -48,6 +54,28 @@ I bet you want to use that private variable in your conversation responses? To a
 in your response text. The framework will replace these tokens with the value of that variable no matter if it was stored in your Watson Conversation context or privately on your application!
 
 ##### Ready to get started building that truly dynamic chat bot...?
+
+
+## Architecture Overview
+
+When building your application, the `conversation-extension-framework` expects the following rough application flow
+
+```
+Client                 |      Your Application      |    conversation-extension         |   External Systems
+
+User sends a message --------> Message Received ---------> handleIncoming() --------------> Watson Conversation
+                                                                                       |
+                                                                                       |--> External API
+                                                                                       |
+                                                                                       |--> Complex JS Function
+                                                          Insert dynamic information   |
+User receives a message <--- Send Response to User <------into conversation response <-|
+```
+
+When using the `conversation-extension-framework`, the developer only needs to write the code to receive and send messages and tell the system how to interact with other external systems.
+The conversation-extension-framework will handle the rest of the work to send the message to Watson Conversation, execute any API calls or dynamic functions, and augment the response with this dynamic information.
+
+The provided [example](./example/) shows how quickly this back end code can be written, even with a javascript API implementation.
 
 
 ## Requirements
