@@ -10,7 +10,13 @@ The Watson Conversation Extension Framework is a Node.js tool that allows develo
 * Context management for front-end interfaces that do not persist context (Slack, Facebook Messenger)
 * Handle inputs from multiple sources (Slack, Facebook Messenger, etc...) with the same core logic
 
+This package provides server side code to handle all communication with Watson Conversation, external (and internal systems), and state management.
+
 But most importantly, the framework is designed to **make it simple** to add these capabilities to your application.
+
+#### What is the Watson Conversation Extension Framework?
+The conversation-extension-framework provides back-end logic to quickly get started building a Watson Conversation chat bot in Node. There is a lot of other work that is required to build a chatbot application, and this package will simplify
+The framework also provides the ability to extend a chatbot and add more advanced features as well, hence the name of the package. Out of the box, it provides the ability to:
 
 #### How simple is it?
 
@@ -50,6 +56,28 @@ in your response text. The framework will replace these tokens with the value of
 ##### Ready to get started building that truly dynamic chat bot...?
 
 
+## Architecture Overview
+
+When building your application, the `conversation-extension-framework` expects the following rough application flow
+
+```
+Client                 |      Your Application      |    conversation-extension         |   External Systems
+
+User sends a message --------> Message Received ---------> handleIncoming() --------------> Watson Conversation
+                                                                                       |
+                                                                                       |--> External API
+                                                                                       |
+                                                                                       |--> Complex JS Function
+                                                          Insert dynamic information   |
+User receives a message <--- Send Response to User <------into conversation response <-|
+```
+
+When using the `conversation-extension-framework`, the developer only needs to write the code to receive and send messages and tell the system how to interact with other external systems.
+The conversation-extension-framework will handle the rest of the work to send the message to Watson Conversation, execute any API calls or dynamic functions, and augment the response with this dynamic information.
+
+The provided [example](./example/) shows how quickly this back end code can be written, even with a javascript API implementation.
+
+
 ## Requirements
 * Node.js 7.6+
 * Your own front-end chat client. (Slack, Facebook Messenger, Web App, etc...) This tool does **NOT** contain any front-end code
@@ -85,7 +113,7 @@ conversationPass: Password from the Watson Conversation credentials (not your bl
 API calls are registered to this object using the `addAPI` function
 
 ```
-conEx.addAPI('myAPI', (usePrivate, context, privateContext) => {
+conEx.addAPI('myAPI', (usePrivate, context, privateContext, rawResponse) => {
 	return new Promise((resolve, reject) => {
 		resolve({context, privateContext})
 	}
@@ -111,8 +139,9 @@ This function will return a `Promise` to return the following object:
     "responseOptions": {
     	updatesContext: {boolean} if the next user response will update a context value
     	updatesContextType: {string} ('public' | 'private') if the update will occur to context or privateContext
-    	updatesContextField: {string} the field name to be updated (...context['fieldName'])
-    }
+    	updatesContextField: {string} the field name to be updated (...context['fieldName']),
+    },
+    "transientData": {object} optional extra transient data to return. See **Transient Data** section
   },
   "conversationResponse": The raw, final response from Watson Conversation
 }
@@ -126,7 +155,7 @@ The framework allows a developer to register functions that return a `Promise` s
 To register an API call, use the `addAPI` function
 
 ```
-conEx.addAPI('myAPI', (usePrivate, context, privateContext) => {
+conEx.addAPI('myAPI', (usePrivate, context, privateContext, rawResponse) => {
 	return new Promise((resolve, reject) => {
 		resolve({context, privateContext})
 	}
@@ -140,6 +169,7 @@ Arguments:
 	usePrivate: {boolean} a flag to indicate to your function if Watson Conversation has designated the implementation to use private or public context data.
 	context: {object} the (public) context that is sent back and forth from Watson Conversation
 	privateContext: {object} private data that is stored with the application that does not get sent to Watson Conversation
+  rawResponse: {object} a clone of the raw response received from Watson Conversation
 
 Returns:
 	{Promise} that will resolve {context, privateContext}. The logic will use the resolved values to update context and privateContext
@@ -170,6 +200,14 @@ The application is based around the idea of managing two sets context informatio
 
 Both *public* and *private* context can be used to store information to use in API calls as well as to augment the response to the user.
 
+### Transient Data
+
+A special type of data identified as transient data is available to developers as well. This is a specific field, `transientData` in privateContext that will be cleared at each turn in the conversation. This transient data, if available, is returned as part of the response from the `handleIncoming` function.
+
+This is useful if a developer needs to make some data available as part of an API call, but it doesn't necessarily warrant persistence as part of context or privateContext.
+
+To use, simply include an object at `privateContext.transientData` as part of the private context returned from an API call. This will be cleared after it has been returned as part of the response from `handleIncoming`
+
 ### Maintaining State
 
 One of the key functions is to maintain state at the server side. This will allow conversation to flow when the client cannot manage the conversational context, which is basically any case except where you own the client code yourself.
@@ -186,7 +224,7 @@ Even though the user is the same, the application will retrieve two sets of user
 
 ### Storing a User Response
 
-Sometimes a developer will need to store a user's response, for instance, Watson may ask the user a question and need to store that information for later. The application allows for this situation to be quickly and simply addressed with the following syntax on Watson Conversation.
+Sometimes a developer will need to store a user's next response, for instance, Watson may ask the user a question and need to store that information for later. The application allows for this situation to be quickly and simply addressed with the following syntax on Watson Conversation.
 
 ```
 {

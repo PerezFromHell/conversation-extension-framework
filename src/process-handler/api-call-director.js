@@ -6,23 +6,23 @@ let apiCallIndex = {}
  * @param  {string}  apiCall Name of the API call to make.
  * @param  {boolean} usePrivate use public or private context as data source
  * @param  {object}  context public context for the user
- * @param  {object}  privateContext private  context for the uesr
+ * @param  {object}  privateContext private context for the user
+ * @param  {object}  rawResponse rawResponse from conversation (not returned at completion)
  * @return {object}  An object containing updated contexts (if needed)
  *                  {
  *                    context: updated context
  *                    privateContext: updated private context
  *                  }
  */
-let direct = async function (apiCall, usePrivate, context, privateContext) {
+let direct = async function (apiCall, usePrivate, context, privateContext, rawResponse) {
   try {
-    let results = await apiCallIndex[apiCall](usePrivate, context, privateContext)
+    let results = await apiCallIndex[apiCall](usePrivate, context, privateContext, rawResponse)
     context = results.context
     privateContext = results.privateContext
   } catch (e) {
     console.error('unable to make "' + apiCall + '" API call. ensure that the name is registered correctly in the API director and the API calls are defined properly')
     throw e
   }
-
   return {context, privateContext}
 }
 
@@ -34,6 +34,10 @@ let direct = async function (apiCall, usePrivate, context, privateContext) {
  * @return {void} Registers the API call function
  */
 function addAPI (apiCallName, apiCallPromise) {
+  if (typeof apiCallPromise !== 'function') {
+    console.error('unable to add ' + apiCallName + '. Verify that it is a function that returns a promise.')
+    throw new Error('Invalid argument supplied to addAPI function')
+  }
   apiCallIndex[apiCallName] = apiCallPromise
 }
 

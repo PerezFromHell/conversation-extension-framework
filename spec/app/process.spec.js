@@ -290,6 +290,8 @@ describe('Process handler', () => {
       })
     })
     describe('when an API call is requested with public data', () => {
+      let response = {}
+      let privateContext = {}
       beforeAll(async (done) => {
         global.convCallCount = 0
         spyOn(conversationExtensionInstance.handler.apiCallDirector, 'direct').and.callThrough()
@@ -318,21 +320,45 @@ describe('Process handler', () => {
           }
         })
         processUtils.storeUserData('A0A0A8', 'generic', {'public': 'public'}, {'private': 'private'}, {'response': 'response'})
-        await conversationExtensionInstance.handleIncoming('test', 'A0A0A8', 'generic')
+        response = await conversationExtensionInstance.handleIncoming('test', 'A0A0A8', 'generic')
+        privateContext = processUtils.retrieveUserData('A0A0A2', 'generic').privateContext
         done()
       })
       it('calls API director', () => {
         expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalled()
       })
       it('calls API director with correct arguments', () => {
-        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith('diceRoll', false, jasmine.objectContaining({test: 'test-value'}), {'private': 'private'})
+        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith(
+          'diceRoll',
+          false,
+          jasmine.objectContaining({test: 'test-value'}),
+          {'private': 'private'},
+          {
+            output: {
+              text: ['test-response'],
+              apiCall: 'diceRoll'
+            },
+            context: {
+                test: 'test-value'
+            }
+          }
+        )
       })
       it('calls Watson Conversation after leaving API director', () => {
         expect(conversationUtils.sendMessageToConversation.calls.count()).toEqual(2)
       })
+      it('expects to receive transientData', () => {
+        expect(response.userData.transientData.diceRollSuccess).toEqual(true)
+      })
+      it('expects transientData to be replaced', () => {
+        expect(privateContext).toBeDefined()
+        expect(privateContext.transientData).not.toBeDefined()
+      })
     })
 
     describe('when an API call is requested with private data', () => {
+      let response = {}
+      let privateContext = {}
       beforeAll(async (done) => {
         global.convCallCount = 0
         spyOn(conversationExtensionInstance.handler.apiCallDirector, 'direct').and.callThrough()
@@ -361,17 +387,39 @@ describe('Process handler', () => {
           }
         })
         processUtils.storeUserData('A0A0A9', 'generic', {'public': 'public'}, {'private': 'private'}, {'response': 'response'})
-        await conversationExtensionInstance.handleIncoming('test', 'A0A0A9', 'generic')
+        response = await conversationExtensionInstance.handleIncoming('test', 'A0A0A9', 'generic')
+        privateContext = processUtils.retrieveUserData('A0A0A2', 'generic').privateContext
         done()
       })
       it('calls API director', () => {
         expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalled()
       })
       it('calls API director with correct arguments', () => {
-        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith('diceRoll', true, {test: 'test-value'}, jasmine.objectContaining({'private': 'private'}))
+        expect(conversationExtensionInstance.handler.apiCallDirector.direct).toHaveBeenCalledWith(
+          'diceRoll',
+          true,
+          {test: 'test-value'},
+          jasmine.objectContaining({'private': 'private'}),
+          {
+            output: {
+              text: ['test-response'],
+              apiCall: 'diceRoll:private'
+            },
+            context: {
+              test: 'test-value'
+            }
+          }
+        )
       })
       it('calls Watson Conversation after leaving API director', () => {
         expect(conversationUtils.sendMessageToConversation.calls.count()).toEqual(2)
+      })
+      it('expects to receive transient data', () => {
+        expect(response.userData.transientData.diceRollSuccess).toEqual(true)
+      })
+      it('expects transientData to be replaced', () => {
+        expect(privateContext).toBeDefined()
+        expect(privateContext.transientData).not.toBeDefined()
       })
     })
   })

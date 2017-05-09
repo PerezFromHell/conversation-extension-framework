@@ -17,4 +17,7 @@ describe('call to the mock diceRoll API', () => {
     expect(userContexts.privateContext.diceRoll).not.toBeLessThan(1)
     expect(userContexts.privateContext.diceRoll).not.toBeGreaterThan(6)
   })
+  it('should store some transientData', () => {
+    expect(userContexts.privateContext.transientData.diceRollSuccess).toEqual(true)
+  })
 })
