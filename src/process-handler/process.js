@@ -1,6 +1,7 @@
 let processUtils = require('../utils/process')
 let conversationUtils = require('../utils/conversation')
 let apiCallDirector = require('./api-call-director')
+let middlewareDirector = require('./middleware-director')
 
 /**
  * processMessage - The primary logic to process incoming messages from any source
@@ -39,7 +40,8 @@ let processMessage = async function (incomingMessageText, userId, source, option
       }
     }
   }
-  // Store the data to memory
+  // Call pre middleware
+  ({context: userData.context, privateContext: userData.privateContext} = await middlewareDirector.executePre(userData.context, userData.privateContext))
 
   // Potentially multiple API calls can be made
   let loopCount = 0
@@ -103,6 +105,9 @@ let processMessage = async function (incomingMessageText, userId, source, option
     loopCount++
   } while (conversationResponse.output.apiCall && loopCount < 3)
 
+  // Call post middleware
+  ({context: userData.context, privateContext: userData.privateContext} = await middlewareDirector.executePost(userData.context, userData.privateContext, conversationResponse))
+  processUtils.storeUserData(userId, source, userData.context, userData.privateContext, userData.responseOptions)
   let responseText = processUtils.augmentResponse(conversationResponse.output.text.join('\r'), userData.context, userData.privateContext)
   return {responseText, userData, conversationResponse}
 }
@@ -121,5 +126,6 @@ function getFieldAndDestination (expression) {
 
 module.exports = {
   processMessage,
-  apiCallDirector
+  apiCallDirector,
+  middlewareDirector
 }

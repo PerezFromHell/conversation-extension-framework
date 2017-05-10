@@ -12,6 +12,12 @@ class conversationExtension {
   addAPI (apiCallName, apiCallPromise) {
     this.handler.apiCallDirector.addAPI(apiCallName, apiCallPromise)
   }
+  addPreMW (mwFunction) {
+    this.handler.middlewareDirector.addPreMW(mwFunction)
+  }
+  addPostMW (mwFunction) {
+    this.handler.middlewareDirector.addPostMW(mwFunction)
+  }
   async handleIncoming (incomingMessageText, userId, source) {
     try {
       return (await this.handler.processMessage(incomingMessageText, userId, source, this.options))

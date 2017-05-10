@@ -1,4 +1,7 @@
 # Change log
+## 0.2.0-alpha.1 2017MAY10
+* Added pre/post middleware functions
+
 ## 0.1.0 2017MAY09
 * Added transient data capability
 * Small assertions for API call registration

@@ -18,6 +18,9 @@ let conversationExtension = new (require('../'))(process.env.CONVERSATION_API_UR
 // Register the diceRoll API to 'diceRoll'
 conversationExtension.addAPI('diceRoll', require('./api/diceRoll').rollDice)
 
+// Register the timestamp middleware
+conversationExtension.addPreMW(require('./middleware/timestamp').addTimestamp)
+
 // Initialize express
 let app = express()
 
