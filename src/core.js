@@ -1,4 +1,5 @@
 let handler = require('./process-handler/process')
+let processUtils = require('./utils/process')
 
 class conversationExtension {
   constructor (conversationUrl, conversationUser, conversationPassword) {
@@ -8,6 +9,12 @@ class conversationExtension {
       conversationUser: conversationUser,
       conversationPassword: conversationPassword
     }
+  }
+  _retrieveUserData (user, source) {
+    return processUtils.retrieveUserData(user, source)
+  }
+  _storeUserData (user, source, context, privateContext, responseOptions) {
+    return processUtils.storeUserData(user, source, context, privateContext, responseOptions)
   }
   addAPI (apiCallName, apiCallPromise) {
     this.handler.apiCallDirector.addAPI(apiCallName, apiCallPromise)
